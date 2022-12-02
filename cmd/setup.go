@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var helloCmd = &cobra.Command{
+var setup = &cobra.Command{
 	Use:   "setup",
 	Short: "Configures and setups a W&B Server",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -15,5 +15,5 @@ var helloCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand()
+	RootCmd.AddCommand(setup)
 }
