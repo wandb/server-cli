@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
@@ -34,20 +33,21 @@ func initConfig() {
 	home, err := os.UserHomeDir()
 	pterm.Fatal.PrintOnError(err)
 
-	configDir := filepath.Join(home, ".config", "wandbctl", "")
+	configDir := filepath.Join(home, ".config", "wbserver", "")
 	err = os.MkdirAll(configDir, os.ModePerm)
 	pterm.PrintOnError(err)
 
-	viper.AddConfigPath(configDir)
 	viper.SetConfigType("yaml")
-	viper.SetConfigName("settings")
+	viper.SetConfigName("config")
+
+	viper.AddConfigPath(configDir)
+	viper.AddConfigPath(".")
+	viper.SafeWriteConfig()
 
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {
-		if !strings.Contains(viper.ConfigFileUsed(), configDir) {
-			pterm.Debug.Println("Using config file:", viper.ConfigFileUsed())
-		}
+		pterm.Debug.Println("Using config file:", viper.ConfigFileUsed())
 	} else {
 		pterm.PrintOnError(err)
 	}
@@ -55,8 +55,10 @@ func initConfig() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+	configureTheme()
 }
 
 func main() {
 	cmd.RootCmd.Execute()
+	viper.WriteConfig()
 }
