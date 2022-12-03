@@ -42,13 +42,12 @@ func initConfig() {
 
 	viper.AddConfigPath(configDir)
 	viper.AddConfigPath(".")
+	viper.SetDefault("context", "prod")
 	viper.SafeWriteConfig()
 
 	viper.AutomaticEnv()
 
-	if err := viper.ReadInConfig(); err == nil {
-		pterm.Debug.Println("Using config file:", viper.ConfigFileUsed())
-	} else {
+	if err := viper.ReadInConfig(); err != nil {
 		pterm.PrintOnError(err)
 	}
 }

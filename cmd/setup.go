@@ -1,86 +1,79 @@
 package cmd
 
 import (
+	"os/exec"
+	"runtime"
+
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-)
-
-type DeploymentType string
-
-const (
-	ManagedDedicatedCloud DeploymentType = "W&B Managed Dedicated Cloud"
-	ManagedPrivateCloud   DeploymentType = "W&B Managed Private Cloud"
-	PrivateCloud          DeploymentType = "Self-Managed Private Cloud"
-	BareMetal             DeploymentType = "Self-Managed Bare Metal"
-)
-
-type DeploymentPlatform string
-
-const (
-	AWS        DeploymentPlatform = "Amazon Web Services"
-	GCP        DeploymentPlatform = "Google Cloud"
-	Azure      DeploymentPlatform = "Azure"
-	Host       DeploymentPlatform = "Host"
-	Kubernetes DeploymentPlatform = "Kubernetes"
-)
-
-type DeploymentEngine string
-
-const (
-	BYOB      DeploymentEngine = "BYOB"
-	HelmChart DeploymentEngine = "Helm Chart"
-	Terraform DeploymentEngine = "Terraform"
-	Docker    DeploymentEngine = "Docker"
+	"github.com/wandb/server-cli/pkg/config"
 )
 
 func CloudAuthFlow() {
 	pterm.DefaultParagraph.Println(
 		"You will need to sign in to your Weights & Biases Account so gain access to your license keys.",
 	)
+	auth := "https://wandb.ai/authorize"
+	pterm.Blue("You can find your API key in your browser here: https://wandb.ai/authorize")
+
+	switch runtime.GOOS {
+	case "linux":
+		exec.Command("xdg-open", auth).Start()
+	case "windows", "darwin":
+		exec.Command("open", auth).Start()
+	default:
+		pterm.Warning.Print("Could not find default browser")
+	}
+
+	apikey, _ := pterm.DefaultInteractiveTextInput.WithDefaultText("Pate an API key from your profile and hit enter or press ctrl+c to quit").Show()
+	viper.Set("wandb.apikey", apikey)
+	viper.WriteConfig()
 }
 
 func GetDeploymentFlow() (string, string, string) {
-	// This will change when we support context
-	var deployment = "deployment"
 
+	instance := config.GetInstance()
 	dtype, _ := pterm.DefaultInteractiveSelect.
 		WithDefaultText("Select deployment type").
 		WithOptions([]string{
-			string(ManagedDedicatedCloud),
-			string(ManagedPrivateCloud),
-			string(PrivateCloud),
-			string(BareMetal),
+			string(config.ManagedDedicatedCloud),
+			string(config.ManagedPrivateCloud),
+			string(config.PrivateCloud),
+			string(config.BareMetal),
 		}).
 		Show()
-	viper.Set(deployment+".type", dtype)
+
+	instance.SetType(dtype)
 
 	platformOptions := []string{}
 	switch dtype {
-	case string(ManagedDedicatedCloud):
+	case string(config.ManagedDedicatedCloud):
 		fallthrough
-	case string(ManagedPrivateCloud):
+	case string(config.ManagedPrivateCloud):
 		fallthrough
-	case string(PrivateCloud):
-		platformOptions = append(platformOptions, string(AWS), string(GCP), string(Azure))
-	case string(BareMetal):
-		platformOptions = append(platformOptions, string(Host), string(Kubernetes))
+	case string(config.PrivateCloud):
+		platformOptions = append(platformOptions, string(config.AWS), string(config.GCP), string(config.Azure))
+	case string(config.BareMetal):
+		platformOptions = append(platformOptions, string(config.Host), string(config.Kubernetes))
 	}
 	platform, _ := pterm.DefaultInteractiveSelect.
 		WithDefaultText("Select deployment platform").
 		WithOptions(platformOptions).
 		Show()
-	viper.Set(deployment+".platform", platform)
 
-	engine := string(Terraform)
-	if platform == string(Host) {
-		engine = string(Docker)
+	instance.SetPlatform(dtype)
+
+	engine := string(config.Terraform)
+	if platform == string(config.Host) {
+		engine = string(config.Docker)
 	}
-	if platform == string(Kubernetes) {
-		engine = string(HelmChart)
+	if platform == string(config.Kubernetes) {
+		engine = string(config.HelmChart)
 	}
-	viper.Set(deployment+".engine", engine)
-	viper.WriteConfig()
+	instance.SetPlatform(engine)
+	instance.Write()
+
 	return dtype, platform, engine
 }
 
@@ -92,10 +85,10 @@ var setup = &cobra.Command{
 	Use:   "setup",
 	Short: "Configures and setups a W&B Server",
 	Run: func(cmd *cobra.Command, args []string) {
+		CloudAuthFlow()
 		dtype, platform, engine := GetDeploymentFlow()
-		pterm.Info.Print(dtype + " > " + platform + " > " + engine)
-
-		if engine == string(Terraform) {
+		pterm.Info.Println(dtype + " > " + platform + " > " + engine)
+		if engine == string(config.Terraform) {
 			ConfigureTerraformFlow()
 		}
 	},
