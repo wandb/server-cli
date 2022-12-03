@@ -6,7 +6,7 @@ var verify = &cobra.Command{
 	Use:   "verify",
 	Short: "Runs a few tests to make sure the instance is configured correctly.",
 	/*
-	- should test if the bucket has the exact CORS policy
+	- should test if the bucket has the correct CORS policy
 	- should test if the bucket has the right access policy
 	- should test if EKS cluster has access to the bucket
 	- should test if SQS queue is setup, if it is setup - check if it's subscribed to s3 notifications

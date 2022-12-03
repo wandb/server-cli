@@ -5,7 +5,6 @@ import "github.com/spf13/cobra"
 var logs = &cobra.Command{
 	Use:   "logs",
 	Short: "Downloads instance debug bundle.",
-<<<<<<< HEAD
 	/* 
 	Need to check if the user requesting debug bundle 
 	is authenticated as admin. If they are we download
@@ -15,10 +14,7 @@ var logs = &cobra.Command{
 	/*
 	- We might need to check the role of the user against the database
     - This needs to connect to the database in whichever env it's running
-	- [nice] Check
 	*/
-=======
->>>>>>> main
 }
 
 func init() {
