@@ -1,11 +1,14 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"os"
+	"path/filepath"
 
-func GetInstanceContext() string {
-	return viper.GetString("context")
-}
+	"github.com/pterm/pterm"
+)
 
-func SetInstanceContext(key string, value interface{}) {
-	viper.Set("instance."+GetInstanceContext()+"."+key, value)
+func ConfigDir() string {
+	home, err := os.UserHomeDir()
+	pterm.Fatal.PrintOnError(err)
+	return filepath.Join(home, ".config", "wbserver", "")
 }

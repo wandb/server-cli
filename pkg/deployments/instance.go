@@ -1,34 +1,21 @@
-package config
+package deployments
 
-import "github.com/spf13/viper"
+import (
+	"os"
+	"path/filepath"
 
-type DeploymentType string
-
-const (
-	ManagedDedicatedCloud DeploymentType = "W&B Managed Dedicated Cloud"
-	ManagedPrivateCloud   DeploymentType = "W&B Managed Private Cloud"
-	PrivateCloud          DeploymentType = "Self-Managed Private Cloud"
-	BareMetal             DeploymentType = "Self-Managed Bare Metal"
+	"github.com/spf13/viper"
+	"github.com/wandb/server-cli/pkg/config"
+	"github.com/wandb/server-cli/pkg/terraform/tfconfig"
 )
 
-type DeploymentPlatform string
+func GetInstanceContext() string {
+	return viper.GetString("context")
+}
 
-const (
-	AWS        DeploymentPlatform = "Amazon Web Services"
-	GCP        DeploymentPlatform = "Google Cloud"
-	Azure      DeploymentPlatform = "Azure"
-	Host       DeploymentPlatform = "Host"
-	Kubernetes DeploymentPlatform = "Kubernetes"
-)
-
-type DeploymentEngine string
-
-const (
-	BYOB      DeploymentEngine = "BYOB"
-	HelmChart DeploymentEngine = "Helm Chart"
-	Terraform DeploymentEngine = "Terraform"
-	Docker    DeploymentEngine = "Docker"
-)
+func SetInstanceContext(key string, value interface{}) {
+	viper.Set("instance."+GetInstanceContext()+"."+key, value)
+}
 
 func SwitchInstance(name string) *InstanceConfig {
 	viper.Set("instance", name)
@@ -88,4 +75,29 @@ func (c *InstanceConfig) GetFQDN() string {
 
 func (c *InstanceConfig) SetFQDN(value string) {
 	viper.Set("instances."+c.name+".fqdn", value)
+}
+
+func (c *InstanceConfig) SetTerraformConfig(value *tfconfig.TerraformConfig) {
+	viper.Set("instances."+c.name+".terraform", value)
+}
+
+func (c *InstanceConfig) GetTerraformConfig(value tfconfig.TerraformConfig) tfconfig.TerraformConfig {
+	config := tfconfig.NewConfig()
+	viper.UnmarshalKey("instances."+c.name+".terraform", config)
+	return *config
+}
+
+func (c *InstanceConfig) InstanceDirectory() string {
+	path := filepath.Join(config.ConfigDir(), "instances")
+	os.MkdirAll(path, os.ModePerm)
+	return path
+}
+
+func (c *InstanceConfig) GetDeploymentID() string {
+	return viper.GetString("instances." + c.name + ".deployment.id")
+}
+
+func (c *InstanceConfig) SetDeploymentID(value string) *InstanceConfig {
+	viper.Set("instances."+c.name+".deployment.id", value)
+	return c
 }

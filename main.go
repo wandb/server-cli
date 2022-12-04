@@ -2,21 +2,21 @@ package main
 
 import (
 	"os"
-	"path/filepath"
 
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/wandb/server-cli/cmd"
+	"github.com/wandb/server-cli/pkg/config"
 )
 
 func configureTheme() {
 	pterm.EnableDebugMessages()
 	pterm.EnableColor()
 	pterm.DefaultInteractiveSelect.MaxHeight = 15
-	pterm.Debug.Prefix.Text = "🐞"
+	pterm.Debug.Prefix.Text = "d"
 	pterm.Debug.Prefix.Style = &pterm.ThemeDefault.DebugMessageStyle
-	pterm.Info.Prefix.Text = "ⓘ"
+	pterm.Info.Prefix.Text = "i"
 	pterm.Info.Prefix.Style = &pterm.ThemeDefault.InfoMessageStyle
 	pterm.Info.MessageStyle = &pterm.ThemeDefault.DefaultText
 	pterm.Success.Prefix.Text = "✓"
@@ -30,19 +30,15 @@ func configureTheme() {
 }
 
 func initConfig() {
-	home, err := os.UserHomeDir()
-	pterm.Fatal.PrintOnError(err)
-
-	configDir := filepath.Join(home, ".config", "wbserver", "")
-	err = os.MkdirAll(configDir, os.ModePerm)
+	err := os.MkdirAll(config.ConfigDir(), os.ModePerm)
 	pterm.PrintOnError(err)
 
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 
-	viper.AddConfigPath(configDir)
+	viper.AddConfigPath(config.ConfigDir())
 	viper.AddConfigPath(".")
-	viper.SetDefault("context", "prod")
+	viper.SetDefault("instance", "production")
 	viper.SafeWriteConfig()
 
 	viper.AutomaticEnv()
