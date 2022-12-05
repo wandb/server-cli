@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/pterm/pterm"
 	"github.com/spf13/viper"
 	"github.com/wandb/server-cli/pkg/config"
 )
@@ -91,10 +92,24 @@ func (c *InstanceConfig) GetInterface(path string, value interface{}) {
 	viper.UnmarshalKey("instances."+c.name+"."+path, value)
 }
 
-func (c *InstanceConfig) InstanceDirectory() string {
+func (c *InstanceConfig) Directory() string {
 	path := filepath.Join(config.ConfigDir(), "instances", c.name)
 	os.MkdirAll(path, os.ModePerm)
 	return path
+}
+
+func (c *InstanceConfig) WriteFile(name string, context string) {
+	path := filepath.Join(c.Directory(), name)
+
+	err := os.MkdirAll(filepath.Dir(path), os.ModePerm)
+	pterm.PrintOnError(err)
+
+	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	pterm.Fatal.PrintOnError(err)
+
+	defer f.Close()
+	_, err = f.WriteString(context)
+	pterm.Fatal.PrintOnError(err)
 }
 
 func (c *InstanceConfig) GetDeploymentID() string {

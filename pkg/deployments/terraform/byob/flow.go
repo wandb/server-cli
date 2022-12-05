@@ -1,7 +1,9 @@
 package byob
 
 import (
+	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/pterm/pterm"
 	"github.com/wandb/server-cli/pkg/deployments"
@@ -39,4 +41,15 @@ func ConfigureBYOB() {
 
 	i.SetInterface("byob", cfg)
 	i.Write()
+
+	tf := deployments.GetTerraformTemplate("byob_aws")
+
+	b := new(strings.Builder)
+	tmpl, err := template.New("byob").Parse(tf)
+	pterm.Fatal.PrintOnError(err)
+
+	err = tmpl.Execute(b, cfg)
+	pterm.Fatal.PrintOnError(err)
+
+	i.WriteFile(filepath.Join("terraform", "byob.tf"), b.String())
 }

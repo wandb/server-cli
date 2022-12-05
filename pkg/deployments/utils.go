@@ -8,7 +8,8 @@ import (
 )
 
 func GetTerraformTemplate(name string) string {
-	req, err := http.NewRequest("GET", "https://icanhazdadjoke.com", nil)
+	url := "https://raw.githubusercontent.com/wandb/server-cli/main/templates/" + name + ".tf"
+	req, err := http.NewRequest("GET", url, nil)
 	pterm.Fatal.PrintOnError(err)
 
 	client := &http.Client{}
