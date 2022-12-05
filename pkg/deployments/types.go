@@ -35,11 +35,12 @@ const (
 
 var (
 	deploymentPlatformsMap = map[string]DeploymentPlatform{
-		"Kubernetes": Kubernetes,
-		"Host":       Host,
-		"Azure":      Azure,
-		"GCP":        GCP,
-		"AWS":        AWS,
+		"Kubernetes":          Kubernetes,
+		"Host":                Host,
+		"Azure":               Azure,
+		"GCP":                 GCP,
+		"AWS":                 AWS,
+		"Amazon Web Services": AWS,
 	}
 )
 

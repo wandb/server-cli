@@ -10,6 +10,6 @@ type AWSBYOBConfig struct{}
 type BYOBConfig struct {
 	BucketPrefix string
 	Region       string
-	Google       *GoogleBYOBConfig
-	AWS          *AWSBYOBConfig
+	Google       *GoogleBYOBConfig `yaml:",omitempty"`
+	AWS          *AWSBYOBConfig    `yaml:",omitempty"`
 }

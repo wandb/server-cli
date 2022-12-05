@@ -9,6 +9,7 @@ import (
 
 func ConfigureBYOB() {
 	i := deployments.GetInstance()
+	platform := i.GetPlatform()
 
 	canDoByob := i.GetEngine() == deployments.Terraform &&
 		i.GetType() == deployments.ManagedDedicatedCloud
@@ -24,4 +25,18 @@ func ConfigureBYOB() {
 	bucketPrefix = strings.ToLower(bucketPrefix)
 	bucketPrefix = strings.ReplaceAll(bucketPrefix, " ", "-")
 	cfg.BucketPrefix = bucketPrefix
+
+	supportedRegions := deployments.SupportedRegions(platform)
+	cfg.Region, _ = pterm.
+		DefaultInteractiveSelect.
+		WithOptions(supportedRegions).
+		Show("Select region")
+
+	if platform == deployments.GCP {
+		cfg.Google = new(GoogleBYOBConfig)
+		cfg.Google.ProjectID, _ = textInput.Show("Project ID")
+	}
+
+	i.SetInterface("byob", cfg)
+	i.Write()
 }

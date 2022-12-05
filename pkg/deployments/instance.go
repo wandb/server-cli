@@ -6,11 +6,10 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/wandb/server-cli/pkg/config"
-	"github.com/wandb/server-cli/pkg/deployments/terraform/tfconfig"
 )
 
 func GetInstanceContext() string {
-	return viper.GetString("context")
+	return viper.GetString("instance")
 }
 
 func SetInstanceContext(key string, value interface{}) {
@@ -31,6 +30,10 @@ func GetInstance() *InstanceConfig {
 
 type InstanceConfig struct {
 	name string
+}
+
+func (c *InstanceConfig) GetName() string {
+	return c.name
 }
 
 func (c *InstanceConfig) Write() {
@@ -80,18 +83,16 @@ func (c *InstanceConfig) SetFQDN(value string) {
 	viper.Set("instances."+c.name+".fqdn", value)
 }
 
-func (c *InstanceConfig) SetTerraformConfig(value *tfconfig.TerraformConfig) {
-	viper.Set("instances."+c.name+".terraform", value)
+func (c *InstanceConfig) SetInterface(path string, value interface{}) {
+	viper.Set("instances."+c.name+"."+path, value)
 }
 
-func (c *InstanceConfig) GetTerraformConfig(value tfconfig.TerraformConfig) tfconfig.TerraformConfig {
-	config := tfconfig.NewConfig()
-	viper.UnmarshalKey("instances."+c.name+".terraform", config)
-	return *config
+func (c *InstanceConfig) GetInterface(path string, value interface{}) {
+	viper.UnmarshalKey("instances."+c.name+"."+path, value)
 }
 
 func (c *InstanceConfig) InstanceDirectory() string {
-	path := filepath.Join(config.ConfigDir(), "instances")
+	path := filepath.Join(config.ConfigDir(), "instances", c.name)
 	os.MkdirAll(path, os.ModePerm)
 	return path
 }

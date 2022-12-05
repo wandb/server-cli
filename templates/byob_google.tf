@@ -1,17 +1,15 @@
 locals {
-    project_id    = "{{.Google.ProjectID}}"
-    zone          = "{{.Google.Zone}}"
-    region        = "{{.Region}}"
-    bucket_prefix = "{{.BucketPrefix}}"
+  project_id    = "{{.Google.ProjectID}}"
+  region        = "{{.Region}}"
+  bucket_prefix = "{{.BucketPrefix}}"
 
-    service_account_email = "deploy@wandb-production.iam.gserviceaccount.com"
-    deletion_protection   = false
+  service_account_email = "deploy@wandb-production.iam.gserviceaccount.com"
+  deletion_protection   = false
 }
 
 provider "google" {
   project = local.project_id
   region  = local.region
-  zone    = local.zone
 }
 
 module "project_factory_project_services" {

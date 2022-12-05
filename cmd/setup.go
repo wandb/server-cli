@@ -8,7 +8,32 @@ import (
 
 	"github.com/wandb/server-cli/pkg/auth"
 	"github.com/wandb/server-cli/pkg/deployments"
+	"github.com/wandb/server-cli/pkg/deployments/terraform/byob"
 )
+
+func ConfigureFlow() {
+	i := deployments.GetInstance()
+	dtype := i.GetType()
+	engine := i.GetEngine()
+
+	useTerraform := engine == deployments.Terraform
+	isManagedDedicatedCloud := dtype == deployments.ManagedDedicatedCloud
+	// isManagedPrivateCloud := dtype == deployments.ManagedPrivateCloud
+	// isPrivateCloud := dtype == deployments.PrivateCloud
+	// isBareMetal := dtype == deployments.BareMetal
+
+	isBYOB := useTerraform && isManagedDedicatedCloud
+	if isBYOB {
+		pterm.DefaultSection.Println("Configure your bucket")
+		byob.ConfigureBYOB()
+		return
+	}
+
+	pterm.Fatal.Println(
+		"Sorry, we currently do not support this configuration type. " +
+			"Please contact support if you this this is an issue.",
+	)
+}
 
 var setup = &cobra.Command{
 	Use:   "setup",
@@ -29,15 +54,6 @@ var setup = &cobra.Command{
 				"will save the state and continue from where you left off.",
 		)
 
-		// pterm.Println()
-		// pterm.Println("1. Cloud Authentication")
-		// pterm.Println("2. Deployment Strategy")
-		// pterm.Println("3. Licensing")
-		// pterm.Println("4. Deploy Configuration")
-		// pterm.Println("5. Instance Authentication (if required)")
-		// pterm.Println("5. Instance Testing (if required)")
-		// pterm.Println()
-
 		confirmed, _ := pterm.DefaultInteractiveConfirm.
 			WithDefaultValue(true).
 			Show("Would you like to continue")
@@ -49,30 +65,7 @@ var setup = &cobra.Command{
 		deployments.GetDeploymentStrategy()
 		deployments.Licensing()
 
-		i := deployments.GetInstance()
-		dtype := i.GetType()
-		// platform := i.GetPlatform()
-		engine := i.GetEngine()
-
-		useTerraform := engine == deployments.Terraform
-		isManagedDedicatedCloud := dtype == deployments.ManagedDedicatedCloud
-		isBYOB := useTerraform && isManagedDedicatedCloud
-		if isBYOB {
-			pterm.Println("Configure BYOB")
-		}
-
-		if isBYOB {
-			pterm.Println("Configure BYOb")
-		}
-
-		if isBYOB {
-			pterm.Println("Configure BYOb")
-		}
-
-		pterm.Error.Println(
-			"Sorry, we currently do not support this configuration type. " +
-				"Please contact support if you this this is an issue.",
-		)
+		ConfigureFlow()
 	},
 }
 

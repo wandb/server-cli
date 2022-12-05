@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -30,27 +28,8 @@ func configureTheme() {
 	pterm.Fatal.Prefix.Style = &pterm.ThemeDefault.FatalMessageStyle
 }
 
-func initConfig() {
-	err := os.MkdirAll(config.ConfigDir(), os.ModePerm)
-	pterm.PrintOnError(err)
-
-	viper.SetConfigType("yaml")
-	viper.SetConfigName("config")
-
-	viper.AddConfigPath(config.ConfigDir())
-	viper.AddConfigPath(".")
-	viper.SetDefault("instance", "production")
-	viper.SafeWriteConfig()
-
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		pterm.PrintOnError(err)
-	}
-}
-
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(config.InitConfig)
 	configureTheme()
 }
 

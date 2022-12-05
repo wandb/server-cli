@@ -1,8 +1,8 @@
 package deployments
 
-func SupportedRegions(platform string) []string {
+func SupportedRegions(platform DeploymentPlatform) []string {
 	switch platform {
-	case string(AWS):
+	case AWS:
 		return []string{
 			"us-east-2",
 			"us-east-1",
@@ -13,7 +13,7 @@ func SupportedRegions(platform string) []string {
 			"us-gov-east-1",
 			"us-gov-west-2",
 		}
-	case string(GCP):
+	case GCP:
 		return []string{}
 	}
 

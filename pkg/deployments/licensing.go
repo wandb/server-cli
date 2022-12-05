@@ -14,8 +14,15 @@ import (
 func Licensing() {
 	pterm.DefaultSection.Println("Licenses")
 
-	deploymentID := GetInstance().GetDeploymentID()
-	if GetInstance().GetDeploymentID() != "" {
+	i := GetInstance()
+	if i.GetType() == ManagedDedicatedCloud {
+		pterm.Success.Print("No licensed required.")
+		pterm.Println()
+		return
+	}
+
+	deploymentID := i.GetDeploymentID()
+	if deploymentID != "" {
 		d, err := deploy.GetDeployment(deploymentID)
 		pterm.Fatal.PrintOnError(err)
 

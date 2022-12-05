@@ -2,9 +2,6 @@ package terraform
 
 import (
 	_ "embed"
-	"fmt"
-	"strings"
-	"text/template"
 
 	"github.com/pterm/pterm"
 
@@ -45,15 +42,12 @@ func ConfigFlow(c tfconfig.TerraformConfig, platform string) {
 	}
 }
 
-//go:embed templates/cloud_aws.tf
-var privateCloudAWS string
-
-func GenerateAWS(config *tfconfig.TerraformConfig) {
-	b := new(strings.Builder)
-	tmpl, _ := template.New("aws").Parse(privateCloudAWS)
-	tmpl.Execute(b, config)
-	fmt.Println(b.String())
-}
+// func GenerateAWS(config *tfconfig.TerraformConfig) {
+// 	b := new(strings.Builder)
+// 	tmpl, _ := template.New("aws").Parse(privateCloudAWS)
+// 	tmpl.Execute(b, config)
+// 	fmt.Println(b.String())
+// }
 
 func NewTerraformConfig() *tfconfig.TerraformConfig {
 	cfg := new(tfconfig.TerraformConfig)
