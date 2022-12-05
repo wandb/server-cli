@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/wandb/server-cli/pkg/config"
-	"github.com/wandb/server-cli/pkg/terraform/tfconfig"
+	"github.com/wandb/server-cli/pkg/deployments/terraform/tfconfig"
 )
 
 func GetInstanceContext() string {
@@ -37,8 +37,9 @@ func (c *InstanceConfig) Write() {
 	viper.WriteConfig()
 }
 
-func (c *InstanceConfig) GetType() string {
-	return viper.GetString("instances." + c.name + ".type")
+func (c *InstanceConfig) GetType() DeploymentType {
+	t, _ := ParseType(viper.GetString("instances." + c.name + ".type"))
+	return t
 }
 
 func (c *InstanceConfig) SetType(value string) {
@@ -53,16 +54,18 @@ func (c *InstanceConfig) SetAPIKey(value string) {
 	viper.Set("instances."+c.name+".apikey", value)
 }
 
-func (c *InstanceConfig) GetEngine() string {
-	return viper.GetString("instances." + c.name + ".engine")
+func (c *InstanceConfig) GetEngine() DeploymentEngine {
+	t, _ := ParseEngine(viper.GetString("instances." + c.name + ".engine"))
+	return t
 }
 
 func (c *InstanceConfig) SetEngine(value string) {
 	viper.Set("instances."+c.name+".engine", value)
 }
 
-func (c *InstanceConfig) GetPlatform() string {
-	return viper.GetString("instances." + c.name + ".platform")
+func (c *InstanceConfig) GetPlatform() DeploymentPlatform {
+	p, _ := ParsePlatform(viper.GetString("instances." + c.name + ".platform"))
+	return p
 }
 
 func (c *InstanceConfig) SetPlatform(value string) {

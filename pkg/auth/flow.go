@@ -6,31 +6,51 @@ import (
 
 	"github.com/pterm/pterm"
 	"github.com/spf13/viper"
+	"github.com/wandb/server-cli/pkg/api/wandb"
 )
 
 func CloudAuthFlow() {
+	pterm.DefaultSection.Println("Cloud Authentication")
+
 	if viper.GetString("wandb.apikey") != "" {
+		viewer, err := wandb.GetViewer()
+		pterm.Fatal.PrintOnError(err)
+		pterm.Success.Print("You are sign in as, ")
+		pterm.Bold.Print(pterm.Green(viewer.Name))
+		pterm.Println()
 		return
 	}
 
-	pterm.DefaultSection.Println("Authenticate")
-
 	pterm.DefaultParagraph.Println(
-		"You will need to sign in to your Weights & Biases Account so gain access to your license keys.",
+		"You will need to sign in to your Weights & Biases Cloud Account " +
+			"for managing and accessing license keys. Please use your account " +
+			"that is linked to your work email.",
 	)
+	pterm.Println()
 	auth := "https://wandb.ai/authorize"
-	pterm.Blue("You can find your API key in your browser here: https://wandb.ai/authorize")
+	pterm.DefaultParagraph.Println("You can access your API key here:")
+	pterm.Bold.Println(pterm.Cyan("\thttps://wandb.ai/authorize"))
+	pterm.Println()
 
 	switch runtime.GOOS {
 	case "linux":
 		exec.Command("xdg-open", auth).Start()
 	case "windows", "darwin":
 		exec.Command("open", auth).Start()
-	default:
-		pterm.Warning.Print("Could not find default browser")
 	}
 
-	apikey, _ := pterm.DefaultInteractiveTextInput.WithDefaultText("Pate an API key from your profile and hit enter or press ctrl+c to quit").Show()
+	apikey, _ := pterm.DefaultInteractiveTextInput.
+		Show("Paste your API key")
+
 	viper.Set("wandb.apikey", apikey)
+
+	viewer, err := wandb.GetViewer()
+	pterm.Fatal.PrintOnError(err)
+
+	pterm.Println()
+	pterm.Print("Hello, ")
+	pterm.Bold.Println(pterm.Cyan(viewer.Name))
+	pterm.Println()
+
 	viper.WriteConfig()
 }

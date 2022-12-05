@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 
@@ -8,82 +10,69 @@ import (
 	"github.com/wandb/server-cli/pkg/deployments"
 )
 
-func GetDeploymentFlow() (string, string, string) {
-	instance := deployments.GetInstance()
-
-	dtype := instance.GetType()
-	if dtype == "" {
-		dtype, _ = pterm.DefaultInteractiveSelect.
-			WithDefaultText("Select deployment type").
-			WithOptions([]string{
-				string(deployments.ManagedDedicatedCloud),
-				string(deployments.ManagedPrivateCloud),
-				string(deployments.PrivateCloud),
-				string(deployments.BareMetal),
-			}).
-			Show()
-
-		instance.SetType(dtype)
-	}
-
-	platform := instance.GetPlatform()
-	if platform == "" {
-		platformOptions := []string{}
-		switch dtype {
-		case string(deployments.ManagedDedicatedCloud):
-			fallthrough
-		case string(deployments.ManagedPrivateCloud):
-			fallthrough
-		case string(deployments.PrivateCloud):
-			platformOptions = append(platformOptions, string(deployments.AWS), string(deployments.GCP), string(deployments.Azure))
-		case string(deployments.BareMetal):
-			platformOptions = append(platformOptions, string(deployments.Host), string(deployments.Kubernetes))
-		}
-		platform, _ = pterm.DefaultInteractiveSelect.
-			WithDefaultText("Select deployment platform").
-			WithOptions(platformOptions).
-			Show()
-
-		instance.SetPlatform(platform)
-	}
-
-	engine := instance.GetEngine()
-	if engine == "" {
-		engine = string(deployments.Terraform)
-		if platform == string(deployments.Host) {
-			engine = string(deployments.Docker)
-		}
-		if platform == string(deployments.Kubernetes) {
-			engine = string(deployments.HelmChart)
-		}
-		instance.SetEngine(engine)
-	}
-	instance.Write()
-
-	return dtype, platform, engine
-}
-
 var setup = &cobra.Command{
 	Use:   "setup",
 	Short: "Configures and setups a W&B Server",
 	Run: func(cmd *cobra.Command, args []string) {
-		auth.CloudAuthFlow()
-		deployments.CreateDeployment()
-
-		dtype, platform, engine := GetDeploymentFlow()
-		pterm.Bold.Println("Select Deployment Stratgy")
-		pterm.Println(
-			pterm.Green(dtype) +
-				" > " + pterm.Green(platform) + " > " +
-				pterm.Green(engine),
-		)
 
 		pterm.Println()
+		pterm.DefaultParagraph.Println(
+			pterm.Yellow(
+				"We recommend that you consider using the https://wandb.ai cloud before privately " +
+					"hosting a W&B Server on your infrastructure. The cloud is simple and secure, " +
+					"with no configuration required.",
+			),
+		)
+		pterm.Println()
+		pterm.DefaultParagraph.Println(
+			"Now we will walk you though setting up a W&B Server. If you exit at anytime we " +
+				"will save the state and continue from where you left off.",
+		)
 
-		// flow.ConfigureTerraformFlow(platform)
-		// if engine == string(config.Terraform) {
-		// 	ConfigureTerraformFlow()
-		// }
+		// pterm.Println()
+		// pterm.Println("1. Cloud Authentication")
+		// pterm.Println("2. Deployment Strategy")
+		// pterm.Println("3. Licensing")
+		// pterm.Println("4. Deploy Configuration")
+		// pterm.Println("5. Instance Authentication (if required)")
+		// pterm.Println("5. Instance Testing (if required)")
+		// pterm.Println()
+
+		confirmed, _ := pterm.DefaultInteractiveConfirm.
+			WithDefaultValue(true).
+			Show("Would you like to continue")
+		if !confirmed {
+			os.Exit(1)
+		}
+
+		auth.CloudAuthFlow()
+		deployments.GetDeploymentStrategy()
+		deployments.Licensing()
+
+		i := deployments.GetInstance()
+		dtype := i.GetType()
+		// platform := i.GetPlatform()
+		engine := i.GetEngine()
+
+		useTerraform := engine == deployments.Terraform
+		isManagedDedicatedCloud := dtype == deployments.ManagedDedicatedCloud
+		isBYOB := useTerraform && isManagedDedicatedCloud
+		if isBYOB {
+			pterm.Println("Configure BYOB")
+		}
+
+		if isBYOB {
+			pterm.Println("Configure BYOb")
+		}
+
+		if isBYOB {
+			pterm.Println("Configure BYOb")
+		}
+
+		pterm.Error.Println(
+			"Sorry, we currently do not support this configuration type. " +
+				"Please contact support if you this this is an issue.",
+		)
 	},
 }
 

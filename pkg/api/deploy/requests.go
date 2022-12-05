@@ -2,7 +2,7 @@ package deploy
 
 import (
 	"github.com/hasura/go-graphql-client"
-	"github.com/wandb/server-cli/pkg/terraform/api/wandb"
+	"github.com/wandb/server-cli/pkg/api/wandb"
 )
 
 var client = graphql.

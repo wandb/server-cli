@@ -6,6 +6,7 @@ import (
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
 	"github.com/wandb/server-cli/cmd"
 	"github.com/wandb/server-cli/pkg/config"
 )

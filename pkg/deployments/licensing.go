@@ -6,12 +6,24 @@ import (
 	"time"
 
 	"github.com/pterm/pterm"
-	"github.com/wandb/server-cli/pkg/terraform/api/deploy"
-	"github.com/wandb/server-cli/pkg/terraform/api/wandb"
+	"github.com/wandb/server-cli/pkg/api/deploy"
+	"github.com/wandb/server-cli/pkg/api/wandb"
 	"github.com/xeonx/timeago"
 )
 
-func CreateDeployment() {
+func Licensing() {
+	pterm.DefaultSection.Println("Licenses")
+
+	deploymentID := GetInstance().GetDeploymentID()
+	if GetInstance().GetDeploymentID() != "" {
+		d, err := deploy.GetDeployment(deploymentID)
+		pterm.Fatal.PrintOnError(err)
+
+		pterm.Success.Print("Licensed instance found: ")
+		pterm.Bold.Println(pterm.Green(d.Name))
+		return
+	}
+
 	licenses, err := deploy.GetActiveLicenseOrders()
 	pterm.Fatal.PrintOnError(err)
 
@@ -27,13 +39,9 @@ func CreateDeployment() {
 	pterm.Println("We found a pending license!")
 	pterm.Println(pterm.Gray("If this information is not correct please contact sales."))
 	license := licenses[0]
-	flagNames := []string{}
-	for _, f := range license.Flags {
-		flagNames = append(flagNames, f.Name)
-	}
 
 	layout := "2006-01-02T15:04:05.000Z"
-	expiresAt, err := time.Parse(layout, license.ExpiresAt)
+	expiresAt, _ := time.Parse(layout, license.ExpiresAt)
 	td := [][]string{
 		{"Max Users", fmt.Sprint(license.MaxUsers)},
 		{"Max Teams", fmt.Sprint(license.MaxTeams)},
@@ -70,16 +78,20 @@ func CreateDeployment() {
 	}
 
 	if organizationID == "" {
-		orgName, _ := pterm.DefaultInteractiveTextInput.Show("Organization name")
+		orgName, _ := pterm.DefaultInteractiveTextInput.
+			Show("Organization name")
 		org, _ := wandb.CreateOrganization(orgName)
 		organizationID = org.ID
 	}
 
-	name, err := pterm.DefaultInteractiveTextInput.Show("Instance Name")
+	pterm.DefaultParagraph.Println(
+		"If you have multiple instances names are useful " +
+			"for identify each one.",
+	)
+	name, err := pterm.DefaultInteractiveTextInput.Show("Instance name")
 	pterm.Fatal.PrintOnError(err)
 	d, err := deploy.CreateDeploymentFromOrder(license.ID, name, organizationID)
 	pterm.Fatal.PrintOnError(err)
 	GetInstance().SetDeploymentID(d.ID).Write()
-
 	pterm.Println()
 }

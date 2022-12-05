@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/pterm/pterm"
-	"github.com/wandb/server-cli/pkg/terraform/tfconfig"
+	"github.com/wandb/server-cli/pkg/deployments/terraform/tfconfig"
 )
 
 type LoadBalancerConfig struct {

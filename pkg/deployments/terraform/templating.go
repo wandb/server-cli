@@ -7,8 +7,9 @@ import (
 	"text/template"
 
 	"github.com/pterm/pterm"
+
 	"github.com/wandb/server-cli/pkg/deployments"
-	"github.com/wandb/server-cli/pkg/terraform/tfconfig"
+	"github.com/wandb/server-cli/pkg/deployments/terraform/tfconfig"
 )
 
 func ConfigFlow(c tfconfig.TerraformConfig, platform string) {

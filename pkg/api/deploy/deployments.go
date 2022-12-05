@@ -22,7 +22,7 @@ func GetDeployment(id string) (Deployment, error) {
 		Deployment Deployment `graphql:"deployment(id: $id)"`
 	}
 	variables := map[string]interface{}{
-		"id": id,
+		"id": graphql.ID(id),
 	}
 	err := client.Query(
 		context.Background(),
@@ -31,12 +31,6 @@ func GetDeployment(id string) (Deployment, error) {
 		graphql.OperationName("ServerCLIDeployment"),
 	)
 	return query.Deployment, err
-}
-
-type DeploymentOrderCreateInput struct {
-	name           string
-	description    string
-	organizationId string
 }
 
 func CreateDeploymentFromOrder(
