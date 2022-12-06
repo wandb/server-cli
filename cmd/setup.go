@@ -8,6 +8,7 @@ import (
 
 	"github.com/wandb/server-cli/pkg/auth"
 	"github.com/wandb/server-cli/pkg/deployments"
+	"github.com/wandb/server-cli/pkg/deployments/terraform"
 	"github.com/wandb/server-cli/pkg/deployments/terraform/byob"
 )
 
@@ -40,6 +41,7 @@ var setup = &cobra.Command{
 	Short: "Configures and setups a W&B Server",
 	Run: func(cmd *cobra.Command, args []string) {
 
+		terraform.CompatibleVersions()
 		pterm.Println()
 		pterm.DefaultParagraph.Println(
 			pterm.Yellow(
@@ -53,6 +55,7 @@ var setup = &cobra.Command{
 			"Now we will walk you though setting up a W&B Server. If you exit at anytime we " +
 				"will save the state and continue from where you left off.",
 		)
+		pterm.Println()
 
 		confirmed, _ := pterm.DefaultInteractiveConfirm.
 			WithDefaultValue(true).
