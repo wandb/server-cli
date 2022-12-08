@@ -6,6 +6,7 @@ import (
 
 	"github.com/pterm/pterm"
 	"github.com/spf13/viper"
+	"github.com/wandb/server-cli/pkg/api/deploy"
 	"github.com/wandb/server-cli/pkg/config"
 )
 
@@ -35,6 +36,11 @@ type InstanceConfig struct {
 
 func (c *InstanceConfig) GetName() string {
 	return c.name
+}
+
+func (c *InstanceConfig) GetLatestLicense() string {
+	license, _ := deploy.GetLicense(c.GetDeploymentID())
+	return license
 }
 
 func (c *InstanceConfig) Write() {

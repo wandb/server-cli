@@ -1,22 +1,26 @@
-package cloudprivate
+package privatecloud
 
 import (
 	"net/netip"
 	"strings"
 
 	"github.com/pterm/pterm"
-	"github.com/wandb/server-cli/pkg/deployments/terraform/tfconfig"
 )
 
 type LoadBalancerConfig struct {
+	AllowedInboundCIDRs4 []string
+	AllowedInboundCIDRs6 []string
 }
 
-func AllowListFlow(config *tfconfig.TerraformConfig) {
+func ConfigureAllowList(config *LoadBalancerConfig) {
 	pterm.DefaultParagraph.
 		Println(
 			"An allow list lets you set which IP address can connect " +
 				"to your instance. Default is all IP addresses (0.0.0.0/0 and ::/0). ",
 		)
+
+	config.AllowedInboundCIDRs4 = []string{"0.0.0.0/0"}
+	config.AllowedInboundCIDRs6 = []string{"::/0"}
 
 	enable, _ := pterm.
 		DefaultInteractiveConfirm.
@@ -34,6 +38,7 @@ func AllowListFlow(config *tfconfig.TerraformConfig) {
 
 		validCidrs6 := []string{}
 		validCidrs4 := []string{}
+
 		for _, cidr := range strings.Split(cidrs, "\n") {
 			if cidr == "" {
 				continue
@@ -54,7 +59,15 @@ func AllowListFlow(config *tfconfig.TerraformConfig) {
 		}
 
 		if areCidrsValid {
+			config.AllowedInboundCIDRs4 = validCidrs4
+			config.AllowedInboundCIDRs6 = validCidrs6
 			return
 		}
 	}
+}
+
+func ConfigureLoadBalancer() *LoadBalancerConfig {
+	config := new(LoadBalancerConfig)
+	ConfigureAllowList(config)
+	return config
 }

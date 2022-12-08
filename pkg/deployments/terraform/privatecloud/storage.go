@@ -1,4 +1,4 @@
-package cloudprivate
+package privatecloud
 
 import "github.com/pterm/pterm"
 
