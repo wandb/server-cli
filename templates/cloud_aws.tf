@@ -2,6 +2,8 @@ locals {
   wandb_license = "{{.License}}"
   wandb_image   = "{{.Docker.Image}}"
   wandb_version = "{{.Docker.Version}}"
+  wandb_apikey  = "{{.APIKey}}"
+  deployment_id = "{{.DeploymentID}}"
 
   database_engine_version = "{{.Database.Version}}"
   database_instance_class = "{{.Database.Size}}"
@@ -27,6 +29,13 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.6"
     }
+  }
+  
+  # Use deploy as your backend for storing terraform state.
+  backend "http" {
+    address  = "https://deploy.wandb.ai/api/terraform/state/${local.deployment_id}"
+    username = "apikey"
+    password = local.wandb_apikey
   }
 }
 
