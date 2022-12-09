@@ -5,8 +5,13 @@ import (
 	"github.com/wandb/server-cli/pkg/deployments"
 )
 
+type DockerConfig struct {
+	Version string
+	Image   string
+}
+
 type PrivateCloudConfig struct {
-	APIKey string `yaml:",omit"`
+	APIKey string `yaml:"-"`
 
 	// Azure
 	AzureSubscriptionID string `yaml:",omitempty"`
@@ -18,10 +23,10 @@ type PrivateCloudConfig struct {
 	GoogleProjectID string `yaml:",omitempty"`
 
 	// Terraform
-	ModuleKubeVersion   string `yaml:",omit"`
-	ModuleGoogleVersion string `yaml:",omit"`
-	ModuleAzureVersion  string `yaml:",omit"`
-	ModuleHelmVersion   string `yaml:",omit"`
+	ModuleKubeVersion   string `yaml:"-"`
+	ModuleGoogleVersion string `yaml:"-"`
+	ModuleAzureVersion  string `yaml:"-"`
+	ModuleHelmVersion   string `yaml:"-"`
 
 	// General
 	Region             string
@@ -31,8 +36,8 @@ type PrivateCloudConfig struct {
 	UseInternalQueue   bool
 
 	// Instance Properties
-	DeploymentID string `yaml:",omit"`
-	License      string `yaml:",omit"`
+	DeploymentID string `yaml:"-"`
+	License      string `yaml:"-"`
 
 	// DNS
 	Subdomain    string
@@ -41,8 +46,7 @@ type PrivateCloudConfig struct {
 	PublicAccess bool
 
 	// Loadbalancer
-	AllowedInboundCIDRs4 []string
-	AllowedInboundCIDRs6 []string
+	LoadBalancer *LoadBalancerConfig
 
 	// Networking
 
@@ -51,8 +55,7 @@ type PrivateCloudConfig struct {
 	KubernetesVMSize       bool
 
 	// Docker Config
-	DockerImage   string
-	DockerVersion string
+	Docker *DockerConfig `yaml:"-"`
 
 	OIDCIssuer        string
 	OIDCClientID      string
@@ -61,19 +64,31 @@ type PrivateCloudConfig struct {
 	DisableCodeSaving bool
 
 	// Database
-	DatabaseVersion string
-	DatabaseSize    string
+	Database *DatabaseConfig
 }
 
 func ConfigurePrivateCloud() {
 	i := deployments.GetInstance()
+	platform := i.GetPlatform()
+
 	config := new(PrivateCloudConfig)
+
+	config.Docker = new(DockerConfig)
+	config.Docker.Version = ""
+	config.Docker.Image = "wandb/local"
 
 	config.APIKey = viper.GetString("wandb.apikey")
 	config.DeploymentID = i.GetDeploymentID()
 	config.License = i.GetLatestLicense()
+
 	config.DeletionProtection = true
 	config.EnableRedis = true
 	config.UseInternalQueue = true
 	config.DisableCodeSaving = false
+
+	config.Database = ConfigureDatabase(platform)
+	config.LoadBalancer = ConfigureLoadBalancer()
+
+	i.SetInterface("private-cloud", config)
+	i.Write()
 }

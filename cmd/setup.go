@@ -10,6 +10,7 @@ import (
 	"github.com/wandb/server-cli/pkg/deployments"
 	"github.com/wandb/server-cli/pkg/deployments/terraform"
 	"github.com/wandb/server-cli/pkg/deployments/terraform/byob"
+	"github.com/wandb/server-cli/pkg/deployments/terraform/privatecloud"
 )
 
 func ConfigureFlow() {
@@ -20,13 +21,19 @@ func ConfigureFlow() {
 	useTerraform := engine == deployments.Terraform
 	isManagedDedicatedCloud := dtype == deployments.ManagedDedicatedCloud
 	// isManagedPrivateCloud := dtype == deployments.ManagedPrivateCloud
-	// isPrivateCloud := dtype == deployments.PrivateCloud
 	// isBareMetal := dtype == deployments.BareMetal
 
 	isBYOB := useTerraform && isManagedDedicatedCloud
 	if isBYOB {
 		pterm.DefaultSection.Println("Configure your bucket")
 		byob.ConfigureBYOB()
+		return
+	}
+
+	isPrivateCloud := dtype == deployments.PrivateCloud
+	if isPrivateCloud {
+		pterm.DefaultSection.Println("Configure Instance")
+		privatecloud.ConfigurePrivateCloud()
 		return
 	}
 

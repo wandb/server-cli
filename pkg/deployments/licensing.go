@@ -2,7 +2,6 @@ package deployments
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/pterm/pterm"
@@ -39,13 +38,17 @@ func Licensing() {
 			"We could not find a license assoicated with your account." +
 				" Please make sure you are using your work email.",
 		)
-		pterm.Fatal.Println("No licenses found.")
-		os.Exit(1)
+		pterm.Error.Println("No  pending licenses found.")
+
+		license, _ := pterm.DefaultInteractiveTextInput.Show("Enter license")
+		pterm.Println(license)
+		return
 	}
+
+	license := licenses[0]
 
 	pterm.Println("We found a pending license!")
 	pterm.Println(pterm.Gray("If this information is not correct please contact sales."))
-	license := licenses[0]
 
 	layout := "2006-01-02T15:04:05.000Z"
 	expiresAt, _ := time.Parse(layout, license.ExpiresAt)
