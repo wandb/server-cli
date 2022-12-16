@@ -5,6 +5,8 @@ go 1.19
 require (
 	github.com/google/go-github/v48 v48.1.0
 	github.com/gordonklaus/ineffassign v0.0.0-20220928193011-d2c82e48359b
+	github.com/hashicorp/go-version v1.6.0
+	github.com/hashicorp/hc-install v0.4.0
 	github.com/hasura/go-graphql-client v0.8.1
 	github.com/pterm/pterm v0.12.50
 	github.com/segmentio/golines v0.11.0
@@ -29,11 +31,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gookit/color v1.5.2 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-version v1.6.0 // indirect
-	github.com/hashicorp/hc-install v0.4.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hashicorp/terraform-exec v0.17.3 // indirect
-	github.com/hashicorp/terraform-json v0.14.0 // indirect
 	github.com/hpcloud/tail v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/klauspost/compress v1.15.12 // indirect
@@ -57,7 +55,6 @@ require (
 	github.com/subosito/gotenv v1.4.1 // indirect
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2 // indirect
 	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
-	github.com/zclconf/go-cty v1.11.0 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/exp/typeparams v0.0.0-20220218215828-6cf2b201936e // indirect
 	golang.org/x/mod v0.7.0 // indirect
