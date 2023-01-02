@@ -3,6 +3,7 @@ module github.com/wandb/server-cli
 go 1.19
 
 require (
+	github.com/dustinkirkland/golang-petname v0.0.0-20191129215211-8e5a1ed0cff0
 	github.com/google/go-github/v48 v48.1.0
 	github.com/gordonklaus/ineffassign v0.0.0-20220928193011-d2c82e48359b
 	github.com/hashicorp/go-version v1.6.0

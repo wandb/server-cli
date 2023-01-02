@@ -2,18 +2,11 @@ package terraform
 
 import (
 	"context"
-	"os/exec"
 	"strings"
 
 	"github.com/google/go-github/v48/github"
 	"github.com/pterm/pterm"
 )
-
-func IsTerraformInstalled() bool {
-	cmd := exec.Command("terraform", "-version")
-	err := cmd.Run()
-	return err == nil
-}
 
 func getLastestVersionFromGithub(owner string, repo string) string {
 	ctx := context.Background()
@@ -27,10 +20,6 @@ func getLastestVersionFromGithub(owner string, repo string) string {
 	latestTerraformVersion := strings.TrimPrefix(*res.Name, "v")
 	terraformVersionSpinner.Success("Latest version is v" + latestTerraformVersion)
 	return ""
-}
-
-func GetLatestVersionOfTerraform() string {
-	return getLastestVersionFromGithub("hashicorp", "terraform")
 }
 
 func GetLastestVersionOfTerraformAWS() string {
