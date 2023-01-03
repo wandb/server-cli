@@ -28,12 +28,8 @@ type PrivateCloudConfig struct {
 	ModuleAzureVersion  string `yaml:"-"`
 	ModuleHelmVersion   string `yaml:"-"`
 
-	// General
-	Region             string
-	Namespace          string
-	EnableRedis        bool
-	DeletionProtection bool
-	UseInternalQueue   bool
+	// General Configuration
+	General *GeneralConfig
 
 	// Instance Properties
 	DeploymentID string `yaml:"-"`
@@ -81,11 +77,10 @@ func ConfigurePrivateCloud() {
 	config.DeploymentID = i.GetDeploymentID()
 	config.License = i.GetLatestLicense()
 
-	config.DeletionProtection = true
-	config.EnableRedis = true
-	config.UseInternalQueue = true
-	config.DisableCodeSaving = false
+	// General configuration
+	config.General = GeneralConfiguration(platform)
 
+	config.DisableCodeSaving = false
 	config.Database = ConfigureDatabase(platform)
 	config.LoadBalancer = ConfigureLoadBalancer()
 

@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 
+	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/pterm/pterm"
 )
 
@@ -19,7 +20,12 @@ func GetTerraformTemplate(name string) string {
 	defer resp.Body.Close()
 
 	b, err := io.ReadAll(resp.Body)
-	pterm.Fatal.PrintOnError()
+	pterm.Fatal.PrintOnError(err)
 
 	return string(b)
+}
+
+func PetName() string {
+	petName := petname.Generate(2, "-")
+	return petName
 }
