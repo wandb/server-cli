@@ -8,7 +8,7 @@ locals {
   database_engine_version = "{{.Database.Version}}"
   database_instance_class = "{{.Database.Size}}"
 
-  deletion_protection = "{{.DeletionProtection}}"
+  deletion_protection = {{.DeletionProtection}}
 
   namespace   = "{{.Namespace}}"
   domain_name = "{{.DomainName}}"

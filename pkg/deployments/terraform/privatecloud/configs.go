@@ -29,11 +29,11 @@ type PrivateCloudConfig struct {
 	ModuleHelmVersion   string `yaml:"-"`
 
 	// General
-	General            *GeneralConfig
-	Region             string
-	Namespace          string
-	EnableRedis        bool
-	UseInternalQueue   bool
+	General *GeneralConfig
+	// Region             string
+	// Namespace          string
+	// EnableRedis        bool
+	// UseInternalQueue   bool
 	DeletionProtection bool
 
 	// Instance Properties
@@ -84,10 +84,10 @@ func ConfigurePrivateCloud() {
 
 	// General configuration (Should I creatre General Section instead?)
 	config.General = GeneralConfiguration(platform)
-	config.Namespace = config.General.Namespace
-	config.Region = config.General.Region
-	config.EnableRedis = config.General.EnableRedis
-	config.UseInternalQueue = config.General.UseInternalQueue
+	// config.Namespace = config.General.Namespace
+	// config.Region = config.General.Region
+	// config.EnableRedis = config.General.EnableRedis
+	// config.UseInternalQueue = config.General.UseInternalQueue
 	config.DeletionProtection = true
 
 	config.DisableCodeSaving = false

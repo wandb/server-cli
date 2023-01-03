@@ -64,18 +64,12 @@ func RegionConfig(config *GeneralConfig, platform deployments.DeploymentPlatform
 
 func EnableRedisConfig(config *GeneralConfig) {
 	enable, _ := pterm.DefaultInteractiveConfirm.Show("Would you like to enable external Redis?")
-	if !enable {
-		return
-	}
 
 	config.EnableRedis = enable
 }
 
 func UseInternalQueue(config *GeneralConfig) {
 	enable, _ := pterm.DefaultInteractiveConfirm.Show("Would you like to enable external queue (SNS)?")
-	if !enable {
-		return
-	}
 
 	config.EnableRedis = enable
 }

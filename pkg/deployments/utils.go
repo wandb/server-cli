@@ -19,8 +19,8 @@ func GetTerraformTemplate(name string) string {
 
 	defer resp.Body.Close()
 
-	b, _ := io.ReadAll(resp.Body)
-	pterm.Fatal.PrintOnError()
+	b, err := io.ReadAll(resp.Body)
+	pterm.Fatal.PrintOnError(err)
 
 	return string(b)
 }
