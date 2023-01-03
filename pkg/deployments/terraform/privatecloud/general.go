@@ -6,10 +6,11 @@ import (
 )
 
 type GeneralConfig struct {
-	Namespace        string
-	Region           string
-	EnableRedis      bool
-	UseInternalQueue bool
+	Namespace          string
+	Region             string
+	EnableRedis        bool
+	UseInternalQueue   bool
+	DeletionProtection bool
 }
 
 func GetCloudRegion(platform deployments.DeploymentPlatform) []string {
@@ -38,7 +39,7 @@ func GetCloudRegion(platform deployments.DeploymentPlatform) []string {
 }
 
 func NamespaceConfig(config *GeneralConfig) {
-	petName := deployments.PetName()
+	var petName string
 
 	pterm.DefaultParagraph.
 		Println("The namespace will prefix most of W&B resources name that will be created.\n" +
@@ -50,6 +51,7 @@ func NamespaceConfig(config *GeneralConfig) {
 		pterm.Println(namespace)
 		return
 	}
+	petName = deployments.PetName()
 	pterm.Info.Printf("No namespace was informed, the default '%s' will be used\n", petName)
 
 	config.Namespace = petName
@@ -58,7 +60,7 @@ func NamespaceConfig(config *GeneralConfig) {
 func RegionConfig(config *GeneralConfig, platform deployments.DeploymentPlatform) {
 	regions := GetCloudRegion(platform)
 
-	region, _ := pterm.DefaultInteractiveSelect.WithOptions(regions).Show("Select AWS Region ")
+	region, _ := pterm.DefaultInteractiveSelect.WithOptions(regions).Show("Select Cloud Region")
 	config.Region = region
 }
 
@@ -68,10 +70,28 @@ func EnableRedisConfig(config *GeneralConfig) {
 	config.EnableRedis = enable
 }
 
-func UseInternalQueue(config *GeneralConfig) {
+func UseInternalQueueConfig(config *GeneralConfig) {
 	enable, _ := pterm.DefaultInteractiveConfirm.Show("Would you like to enable external queue (SNS)?")
 
 	config.EnableRedis = enable
+}
+
+func DeletionProtectionConfig(config *GeneralConfig) {
+	enable, _ := pterm.DefaultInteractiveConfirm.
+		Show("Would you like to DISABLE Object Storage Deletion Protection?")
+	if enable {
+		doubleCheck, _ := pterm.DefaultInteractiveConfirm.
+			WithTextStyle(pterm.Warning.MessageStyle).
+			Show("You're about to disable Object Storage Deletion Protection, are you sure?")
+		pterm.Println()
+		if doubleCheck {
+			pterm.Warning.Println("Object Storage Deletion Protection DISABLED.")
+			pterm.Println()
+			config.DeletionProtection = doubleCheck
+		} else {
+			config.DeletionProtection = enable
+		}
+	}
 }
 
 func GeneralConfiguration(platform deployments.DeploymentPlatform) *GeneralConfig {
@@ -79,6 +99,7 @@ func GeneralConfiguration(platform deployments.DeploymentPlatform) *GeneralConfi
 	NamespaceConfig(config)
 	RegionConfig(config, platform)
 	EnableRedisConfig(config)
-	UseInternalQueue(config)
+	UseInternalQueueConfig(config)
+	DeletionProtectionConfig(config)
 	return config
 }

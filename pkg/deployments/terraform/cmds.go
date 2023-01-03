@@ -54,7 +54,7 @@ func InstallTerraform(c string) {
 	}
 
 	if _, err := os.Stat(tfPath); os.IsNotExist(err) {
-		os.Mkdir(tfPath, 0755)
+		os.MkdirAll(tfPath, 0755)
 	}
 
 	installer := &releases.LatestVersion{
