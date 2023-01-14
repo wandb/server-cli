@@ -15,7 +15,7 @@ func CloudAuthFlow() {
 	if viper.GetString("wandb.apikey") != "" {
 		viewer, err := wandb.GetViewer()
 		pterm.Fatal.PrintOnError(err)
-		pterm.Success.Print("You are sign in as, ")
+		pterm.Success.Print("You are signed in as, ")
 		pterm.Bold.Print(pterm.Green(viewer.Name))
 		pterm.Println()
 		return

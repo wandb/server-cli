@@ -2,12 +2,15 @@ package cmd
 
 import (
 	"os"
+	"os/exec"
+	"path/filepath"
 
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 
 	"github.com/wandb/server-cli/pkg/auth"
 	"github.com/wandb/server-cli/pkg/deployments"
+	"github.com/wandb/server-cli/pkg/api/deploy"
 )
 
 var setup = &cobra.Command{
@@ -49,7 +52,9 @@ var setup = &cobra.Command{
 		deployments.GetDeploymentStrategy()
 		deployments.Licensing()
 
+		
 		i := deployments.GetInstance()
+		license, _ := deploy.GetLicense(i.GetDeploymentID())
 		dtype := i.GetType()
 		// platform := i.GetPlatform()
 		engine := i.GetEngine()
@@ -61,12 +66,24 @@ var setup = &cobra.Command{
 			pterm.Println("Configure BYOB")
 		}
 
-		if isBYOB {
-			pterm.Println("Configure BYOb")
-		}
-
-		if isBYOB {
-			pterm.Println("Configure BYOb")
+		ptype := i.GetPlatform()
+		isBareMetal := dtype == deployments.BareMetal
+		isHost := ptype == deployments.Host
+		isDocker := engine == deployments.Docker
+		if isBareMetal && isHost && isDocker {
+			// Need to install wandb if it doesn't exist
+			// Need to add it to the $PATH once installed
+			pterm.Println(getShellType())
+			var command = "wandb server start -e LICENSE="+license
+			cmd := exec.Command(command)
+			pterm.Println(cmd)
+			if err := cmd.Run(); err != nil {
+				pterm.Error.Println(err)
+			}
+			pterm.Success.Println(
+				`wandb container successfully started.
+				 Visit http://localhost:8080 to access the application.`,
+			)
 		}
 
 		pterm.Error.Println(
@@ -74,6 +91,15 @@ var setup = &cobra.Command{
 				"Please contact support if you this this is an issue.",
 		)
 	},
+}
+
+func getShellType() (string){
+    shell, err := exec.LookPath("sh")
+    if err != nil {
+        pterm.Println("Error:", err)
+        return "Not found"
+    }
+    return filepath.Base(shell)
 }
 
 func init() {
