@@ -48,7 +48,7 @@ var setup = &cobra.Command{
 	Short: "Configures and setups a W&B Server",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		terraform.CompatibleVersions()
+		terraform.IsTFInstalledAndCompatible("~> 1.2")
 		pterm.Println()
 		pterm.DefaultParagraph.Println(
 			pterm.Yellow(
@@ -66,7 +66,7 @@ var setup = &cobra.Command{
 
 		confirmed, _ := pterm.DefaultInteractiveConfirm.
 			WithDefaultValue(true).
-			Show("Would you like to continue")
+			Show("Would you like to continue?")
 		if !confirmed {
 			os.Exit(1)
 		}

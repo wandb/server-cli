@@ -18,8 +18,8 @@ func GetDeploymentStrategy() {
 			pterm.Blue("W&B Managed Dedicated Cloud"),
 		)
 		pterm.DefaultParagraph.Println(
-			"A managed, dedicated deployment on W&B's" +
-				"single-tenant infrastructure in your choice of cloud region. You can" +
+			"A managed, dedicated deployment on W&B's " +
+				"single-tenant infrastructure in your choice of cloud region. You can " +
 				"provide use with your own bucket for extra security.",
 		)
 		pterm.Println()
